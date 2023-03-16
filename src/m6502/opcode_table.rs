@@ -47,56 +47,24 @@ impl OpcodeEntry {
             cycle_rule,
         }
     }
-
-    const fn clone(&self) -> Self {
-        Self {
-            code: self.code,
-            instruction: self.instruction,
-            addressing_mode: self.addressing_mode,
-            bytes: self.bytes,
-            cycles: self.cycles,
-            cycle_rule: self.cycle_rule,
-        }
-    }
 }
 
-/// Generates `OPCODE_TABLE` from `OPCODE_LIST`
-const fn generate_table() -> [Option<OpcodeEntry>; 256] {
-    let table = [None; 256];
-    generate_table_inner(table, 0)
-}
-
-const fn generate_table_inner(
-    mut inp: [Option<OpcodeEntry>; 256],
-    index: usize,
-) -> [Option<OpcodeEntry>; 256] {
-    if index >= OPCODE_LIST.len() / 4 {
-        inp
-    } else {
-        let entry = OPCODE_LIST[index * 4].clone();
-        inp[entry.code as usize] = Some(entry);
-        if OPCODE_LIST.len() < index * 4 + 1 {
-            let entry2 = OPCODE_LIST[index * 4 + 1].clone();
-            inp[entry.code as usize] = Some(entry2);
+lazy_static::lazy_static! {
+    pub static ref OPCODE_TABLE: [Option<OpcodeEntry>; 256] = {
+        let mut x = [None; 256];
+        for i in OPCODE_LIST {
+            x[i.code as usize] = Some(i.clone());
         }
-        if OPCODE_LIST.len() < index * 4 + 2 {
-            let entry3 = OPCODE_LIST[index * 4 + 2].clone();
-            inp[entry.code as usize] = Some(entry3);
-        }
-        if OPCODE_LIST.len() < index * 4 + 3 {
-            let entry4 = OPCODE_LIST[index * 4 + 3].clone();
-            inp[entry.code as usize] = Some(entry4);
-        }
-        generate_table_inner(inp, index + 1)
-    }
+        x
+    };
 }
 
 /// The table used during instruction parsing. Auto-generated.
-pub const OPCODE_TABLE: [Option<OpcodeEntry>; 256] = generate_table();
+// pub const OPCODE_TABLE: [Option<OpcodeEntry>; 256] = generate_table();
 
 /// An opcode list
 #[rustfmt::skip]
-const OPCODE_LIST: &'static [OpcodeEntry] = &[
+const OPCODE_LIST: &[OpcodeEntry] = &[
     // ADC - Add Memory to Accumulator with Carry
     OpcodeEntry::new(0x69, Instruction::ADC, AddressingMode::Immediate, 2, 2, CycleRule::None),
     OpcodeEntry::new(0x65, Instruction::ADC, AddressingMode::ZeroPage, 2, 3, CycleRule::None),
@@ -121,6 +89,23 @@ const OPCODE_LIST: &'static [OpcodeEntry] = &[
     OpcodeEntry::new(0x16, Instruction::ASL, AddressingMode::ZeroPageX, 2, 6, CycleRule::None),
     OpcodeEntry::new(0x0E, Instruction::ASL, AddressingMode::Absolute, 3, 6, CycleRule::None),
     OpcodeEntry::new(0x1E, Instruction::ASL, AddressingMode::AbsoluteX, 3, 7, CycleRule::None),
+    // BCC - Branch on Carry Clear
+    OpcodeEntry::new(0x90, Instruction::BCC, AddressingMode::Relative, 2, 2, CycleRule::AddOneTwo),
+    // BCS - Branch on Carry Set
+    OpcodeEntry::new(0xB0, Instruction::BCS, AddressingMode::Relative, 2, 2, CycleRule::AddOneTwo),
+    // BEQ - Branch on Result Zero
+    OpcodeEntry::new(0xF0, Instruction::BEQ, AddressingMode::Relative, 2, 2, CycleRule::AddOneTwo),
+    // BIT - Test bits in memory with accumulator
+    OpcodeEntry::new(0x24, Instruction::BIT, AddressingMode::ZeroPage, 2, 3, CycleRule::None),
+    OpcodeEntry::new(0x2C, Instruction::BIT, AddressingMode::Absolute, 3, 4, CycleRule::None),
+    // BMI - Branch on Result Minus
+    OpcodeEntry::new(0x30, Instruction::BMI, AddressingMode::Relative, 2, 2, CycleRule::AddOneTwo),
+    // BNE - Branch on Result not Zero
+    OpcodeEntry::new(0xD0, Instruction::BNE, AddressingMode::Relative, 2, 2, CycleRule::AddOneTwo),
+    // BPL - Branch on Result Plus
+    OpcodeEntry::new(0x10, Instruction::BPL, AddressingMode::Relative, 2, 2, CycleRule::AddOneTwo),
+    // BRK - Force Break
+    OpcodeEntry::new(0x00, Instruction::BRK, AddressingMode::Implied, 1, 7, CycleRule::None),
     // BVC - Branch on Overflow Clear
     OpcodeEntry::new(0x50, Instruction::BVC, AddressingMode::Relative, 2, 2, CycleRule::AddOneTwo),
     // BVS - Branch on Overflow Set

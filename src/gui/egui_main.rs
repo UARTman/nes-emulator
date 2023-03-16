@@ -1,4 +1,7 @@
-use crate::m6502::CPU;
+use crate::{
+    m6502::{bus::Bus, CPU},
+    CPUHarness,
+};
 use egui::{Align2, Context};
 
 pub(crate) struct TopPanel {
@@ -35,10 +38,7 @@ impl TopPanel {
     }
 }
 
-pub(crate) fn draw_app(ctx: &Context, top_panel: &mut TopPanel, cpu: &mut CPU) {
+pub(crate) fn draw_app(ctx: &Context, top_panel: &mut TopPanel, cpu: &mut CPUHarness<impl Bus>) {
     top_panel.draw(ctx);
-
-    egui::Window::new("Status").show(ctx, |ui| {
-        cpu.status.render(ui);
-    });
+    cpu.render(ctx);
 }

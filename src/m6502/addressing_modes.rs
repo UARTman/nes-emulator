@@ -1,3 +1,5 @@
+use super::{bus::Bus, CPUError, CPU};
+
 /// Addressing Mode
 ///
 /// Each instruction has an addressing mode. Depending on it, we can (or can't) read/write value or
@@ -120,4 +122,86 @@ pub enum AddressingMode {
     /// BCC $084A (branch to location "$084A", if the carry flag is clear.)
     /// ```
     Relative,
+}
+
+#[derive(Debug, Copy, Clone)]
+pub enum OperandData {
+    Implied,
+    Literal(u8),
+    Address(u16),
+}
+
+impl OperandData {
+    pub fn value(self, cpu: &CPU<impl Bus>) -> Result<u8, CPUError> {
+        match self {
+            OperandData::Implied => Ok(cpu.ac),
+            OperandData::Literal(lit) => Ok(lit),
+            OperandData::Address(addr) => Ok(cpu.bus.read(addr as usize)),
+        }
+    }
+
+    pub fn write(self, cpu: &mut CPU<impl Bus>, value: u8) -> Result<(), CPUError> {
+        match self {
+            OperandData::Implied => {
+                cpu.ac = value;
+                Ok(())
+            }
+            OperandData::Literal(_) => Err(CPUError::OperandNotWriteable(self)),
+            OperandData::Address(addr) => {
+                cpu.bus.write(addr as usize, value);
+                Ok(())
+            }
+        }
+    }
+
+    pub fn address(self) -> Result<u16, CPUError> {
+        match self {
+            OperandData::Address(addr) => Ok(addr),
+            _ => Err(CPUError::OperandNotAddress(self)),
+        }
+    }
+}
+
+impl<T: Bus> CPU<T> {
+    pub fn fetch_op_data(&mut self, mode: AddressingMode) -> OperandData {
+        match mode {
+            AddressingMode::Implied => OperandData::Implied,
+            AddressingMode::Immediate => OperandData::Literal(self.fetch_byte()),
+            AddressingMode::Absolute => OperandData::Address(self.fetch_word()),
+            AddressingMode::ZeroPage => OperandData::Address(self.fetch_byte() as u16),
+            AddressingMode::AbsoluteX => OperandData::Address(self.fetch_word() + self.x as u16),
+            AddressingMode::AbsoluteY => OperandData::Address(self.fetch_word() + self.y as u16),
+            AddressingMode::ZeroPageX => {
+                OperandData::Address(self.fetch_byte() as u16 + self.x as u16)
+            }
+            AddressingMode::ZeroPageY => {
+                OperandData::Address(self.fetch_byte() as u16 + self.y as u16)
+            }
+            AddressingMode::Indirect => {
+                let addr = self.fetch_word();
+                let target = self.bus.read_word(addr as usize);
+                OperandData::Address(target)
+            }
+            AddressingMode::IndirectX => {
+                let addr = self.fetch_byte() as u16 + self.x as u16;
+                let target = self.bus.read_word(addr as usize);
+                OperandData::Address(target)
+            }
+            AddressingMode::IndirectY => {
+                let addr = self.fetch_byte() as u16;
+                let target = self.bus.read_word(addr as usize) + self.y as u16;
+                OperandData::Address(target)
+            }
+            AddressingMode::Relative => {
+                let obyte = self.fetch_byte();
+                let offset = i8::from_be_bytes([obyte]);
+                // log::info!("Relative addr byte: 0b{obyte:08b} offset: {offset}");
+                if offset >= 0 {
+                    OperandData::Address(self.pc + (offset as u16))
+                } else {
+                    OperandData::Address(self.pc - (-offset as u16))
+                }
+            }
+        }
+    }
 }
