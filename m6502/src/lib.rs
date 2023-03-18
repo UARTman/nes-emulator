@@ -1,3 +1,5 @@
+#![feature(bigint_helper_methods)]
+
 use egui::{Ui, text::LayoutJob, TextFormat};
 use status::Status;
 use thiserror::Error;

@@ -1,19 +1,2 @@
-[package]
-name = "nes-emulator"
-version = "0.1.0"
-edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-egui = "0.20"
-egui-wgpu = "0.20"
-egui-winit = "0.20"
-env_logger = "0.9.3"
-log = "0.4"
-pixels = "0.11.0"
-winit = "0.27"
-winit_input_helper = "0.13"
-thiserror = "*"
-lazy_static = "*"
-rand = "*"
+[workspace]
+members = ["macroquad-frontend", "m6502"]

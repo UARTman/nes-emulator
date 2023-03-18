@@ -8,9 +8,9 @@ impl<T: Bus> CPU<T> {
         let operand = self.fetch_op_data(opcode_data.addressing_mode);
         let opfmt = {
             match operand {
-                crate::m6502::addressing_modes::OperandData::Implied => "".into(),
-                crate::m6502::addressing_modes::OperandData::Literal(x) => format!("0x{x:02x}"),
-                crate::m6502::addressing_modes::OperandData::Address(x) => format!("(0x{x:04x})"),
+                crate::addressing_modes::OperandData::Implied => "".into(),
+                crate::addressing_modes::OperandData::Literal(x) => format!("0x{x:02x}"),
+                crate::addressing_modes::OperandData::Address(x) => format!("(0x{x:04x})"),
             }
         };
         log::debug!(

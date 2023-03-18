@@ -46,12 +46,16 @@ impl Ram {
     }
 }
 
-pub struct Snake {
-    pub memory: [u8; 0x10000],
-    pub pixbuf: [u8; 32 * 32 * 4],
+pub trait SnakeCanvas: Default {
+    fn write_pixel(&mut self, at: usize, colors: (u8, u8, u8, u8));
 }
 
-impl Snake {
+pub struct Snake<T: SnakeCanvas> {
+    pub memory: [u8; 0x10000],
+    pub canvas: T,
+}
+
+impl<T: SnakeCanvas> Snake<T> {
     pub fn new() -> Self {
         let game_code = vec![
             0x20, 0x06, 0x06, 0x20, 0x38, 0x06, 0x20, 0x0d, 0x06, 0x20, 0x2a, 0x06, 0x60, 0xa9,
@@ -82,90 +86,58 @@ impl Snake {
         memory[0x600..0x600 + game_code.len()].copy_from_slice(&game_code);
         Self {
             memory,
-            pixbuf: [60; 32 * 32 * 4],
+            canvas: Default::default(),
         }
     }
 }
 
-impl Bus for Snake {
+impl<T: SnakeCanvas> Bus for Snake<T> {
     fn read(&self, addr: usize) -> u8 {
-        if addr == 0x2 {
-            log::debug!("Read from 0x2, result {}", self.memory[addr]);
-        }
         if addr == 0xFE {
             return rand::thread_rng().gen();
         }
-        // if addr == 0xFF {
-        //     log::info!("0xFF read, value {}", self.memory[0xFF]);
-        // }
         self.memory[addr]
     }
 
     fn write(&mut self, addr: usize, data: u8) {
-        // log::debug!("Write of 0x{data:02x} at 0x{addr:04x}");
-        if addr == 0x2 {
-            log::debug!("Write to 0x2 ({data:02x})");
-        }
         if (0x200..0x600).contains(&addr) {
-            // log::debug!("Write of 0x{data:02x} at 0x{addr:04x}");
-            let px = (addr - 0x200) * 4;
-            if data == 0 {
-                self.pixbuf[px] = 60;
-                self.pixbuf[px + 1] = 60;
-                self.pixbuf[px + 2] = 60;
-                self.pixbuf[px + 3] = 60;
-            } else {
-                match data {
-                    2 | 9 => {
-                        self.pixbuf[px] = 100;
-                        self.pixbuf[px + 1] = 100;
-                        self.pixbuf[px + 2] = 100;
-                        self.pixbuf[px + 3] = 100;
-                    },
-                    3 | 10 => {
-                        self.pixbuf[px] = 255;
-                        self.pixbuf[px + 1] = 0;
-                        self.pixbuf[px + 2] = 0;
-                        self.pixbuf[px + 3] = 255;
-                    },
-                    4 | 11 => {
-                        self.pixbuf[px] = 0;
-                        self.pixbuf[px + 1] = 255;
-                        self.pixbuf[px + 2] = 0;
-                        self.pixbuf[px + 3] = 255;
-                    },
-                    5 | 12 => {
-                        self.pixbuf[px] = 0;
-                        self.pixbuf[px + 1] = 0;
-                        self.pixbuf[px + 2] = 255;
-                        self.pixbuf[px + 3] = 255;
-                    },
-                    6 | 13 => {
-                        self.pixbuf[px] = 255;
-                        self.pixbuf[px + 1] = 0;
-                        self.pixbuf[px + 2] = 255;
-                        self.pixbuf[px + 3] = 255;
-                    },
-                    7 | 14 => {
-                        self.pixbuf[px] = 255;
-                        self.pixbuf[px + 1] = 255;
-                        self.pixbuf[px + 2] = 0;
-                        self.pixbuf[px + 3] = 255;
-                    },
-                    1 => {
-                        self.pixbuf[px] = 255;
-                        self.pixbuf[px + 1] = 255;
-                        self.pixbuf[px + 2] = 255;
-                        self.pixbuf[px + 3] = 255;
-                    },
-                    _ => {
-                        self.pixbuf[px] = rand::thread_rng().gen();
-                        self.pixbuf[px + 1] = rand::thread_rng().gen();
-                        self.pixbuf[px + 2] = rand::thread_rng().gen();
-                        self.pixbuf[px + 3] = rand::thread_rng().gen();
-                    }
+            let at = addr - 0x200;
+            match data {
+                0 => {
+                    self.canvas.write_pixel(at, (60, 60, 60, 255));
                 }
-                
+                2 | 9 => {
+                    self.canvas.write_pixel(at, (100, 100, 100, 255));
+                }
+                3 | 10 => {
+                    self.canvas.write_pixel(at, (255, 0, 0, 255));
+                }
+                4 | 11 => {
+                    self.canvas.write_pixel(at, (0, 255, 0, 255));
+                }
+                5 | 12 => {
+                    self.canvas.write_pixel(at, (0, 0, 255, 255));
+                }
+                6 | 13 => {
+                    self.canvas.write_pixel(at, (255, 0, 255, 255));
+                }
+                7 | 14 => {
+                    self.canvas.write_pixel(at, (255, 255, 0, 255));
+                }
+                1 => {
+                    self.canvas.write_pixel(at, (255, 255, 255, 255));
+                }
+                _ => {
+                    self.canvas.write_pixel(
+                        at,
+                        (
+                            rand::thread_rng().gen(),
+                            rand::thread_rng().gen(),
+                            rand::thread_rng().gen(),
+                            rand::thread_rng().gen(),
+                        ),
+                    );
+                }
             }
         }
         self.memory[addr] = data;

@@ -1,5 +1,5 @@
-use crate::m6502::addressing_modes::AddressingMode;
-use crate::m6502::instructions::Instruction;
+use crate::addressing_modes::AddressingMode;
+use crate::instructions::Instruction;
 
 /// A rule by which the final cycle count of an instruction is determined
 #[derive(Copy, Clone, Debug)]
