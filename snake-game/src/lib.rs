@@ -105,3 +105,12 @@ pub fn snake_cpu<T: SnakeCanvas>() -> CPU<Snake<T>> {
     cpu.pc = 0x600;
     cpu
 }
+
+impl<T: SnakeCanvas + Clone> Clone for Snake<T> {
+    fn clone(&self) -> Self {
+        Self {
+            memory: self.memory.clone(),
+            canvas: self.canvas.clone(),
+        }
+    }
+}

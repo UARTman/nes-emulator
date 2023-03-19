@@ -22,6 +22,7 @@ pub mod stack;
 pub mod status;
 
 /// A 6502 CPU
+#[derive(Clone)]
 pub struct CPU<T: Bus> {
     /// Program counter
     pub pc: u16,

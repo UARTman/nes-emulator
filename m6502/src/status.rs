@@ -1,6 +1,7 @@
 use egui::text::LayoutJob;
 use egui::{Color32, FontFamily, FontId, TextFormat, Ui};
 
+#[derive(Clone)]
 pub struct Status {
     pub byte: u8,
 }

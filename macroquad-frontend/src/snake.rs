@@ -1,6 +1,7 @@
 use macroquad::prelude::Image;
 use snake_game::SnakeCanvas;
 
+#[derive(Clone)]
 pub struct MCSnakeCanvas {
     pub image: Image,
 }

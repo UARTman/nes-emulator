@@ -1,5 +1,7 @@
 use egui::Ui;
 use m6502::{bus::Bus, CPUError, CPU};
+use snake_game::snake_cpu;
+use crate::snake::MCSnakeCanvas;
 
 #[derive(Debug)]
 pub enum HarnessState {
@@ -25,15 +27,17 @@ impl HarnessState {
     }
 }
 
-pub struct Harness<T: Bus> {
+pub struct Harness<T: Bus + Clone> {
+    pub old_cpu: CPU<T>,
     pub cpu: CPU<T>,
     pub frequency: u32,
     pub state: HarnessState,
 }
 
-impl<T: Bus> Harness<T> {
+impl<T: Bus + Clone> Harness<T> {
     pub fn new(cpu: CPU<T>) -> Self {
         Self {
+            old_cpu: cpu.clone(),
             cpu,
             frequency: 60,
             state: HarnessState::Paused,
@@ -65,7 +69,10 @@ impl<T: Bus> Harness<T> {
                 }
             }
             HarnessState::Error(_) => {
-                ui.label("TODO: Implement reset on errors.");
+                if ui.button("Reset").clicked() {
+                    self.cpu = self.old_cpu.clone();
+                    self.state = HarnessState::Paused;
+                }
             }
         }
         ui.horizontal(|ui| {
