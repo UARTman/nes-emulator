@@ -48,7 +48,7 @@ async fn main() {
     let texture = Texture2D::from_image(&harness.cpu.bus.canvas.image);
     texture.set_filter(FilterMode::Nearest);
     let mut draw_params = DrawTextureParams::default();
-    let margin = 20.0;
+    let margin = 30.0;
     let mut width = screen_width();
     let mut height = screen_height();
     let mut screen_m = if screen_width() > screen_height() {
@@ -58,6 +58,8 @@ async fn main() {
     };
     let mut side = screen_m - 2.0 * margin;
     draw_params.dest_size = Some(Vec2 { x: side, y: side });
+    let mut fps_monitor_open = true;
+    let mut cpu_window_open = true;
 
     loop {
         let fps = get_fps();
@@ -88,7 +90,16 @@ async fn main() {
         clear_background(WHITE);
 
         egui_macroquad::ui(|egui_ctx| {
-            egui::Window::new("egui ❤ macroquad").show(egui_ctx, |ui| {
+            egui::TopBottomPanel::top("global-top").show(egui_ctx, |ui| {
+                egui::menu::bar(ui, |ui| {
+                    ui.menu_button("View", |ui| {
+                        ui.checkbox(&mut fps_monitor_open, "FPS monitor");
+                        ui.checkbox(&mut cpu_window_open, "CPU");
+                    })
+                })
+            });
+
+            egui::Window::new("FPS monitor").open(&mut fps_monitor_open).show(egui_ctx, |ui| {
                 ui.horizontal(|ui| {
                     ui.label(format!("FPS: {}", fps));
                     ui.label(format!("Cycles per frame: {}", cpf));
