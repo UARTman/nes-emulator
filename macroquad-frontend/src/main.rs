@@ -1,9 +1,11 @@
+use std::cmp::min;
+
 use harness::Harness;
 use m6502::{
     bus::{Snake, SnakeCanvas},
     CPU,
 };
-use macroquad::{prelude::*};
+use macroquad::prelude::*;
 
 pub mod harness;
 
@@ -18,7 +20,7 @@ impl Default for MCSnakeCanvas {
             width: 32,
             height: 32,
         };
-        for _ in 0..32*32 {
+        for _ in 0..32 * 32 {
             image.bytes.push(60);
             image.bytes.push(60);
             image.bytes.push(60);
@@ -46,14 +48,42 @@ async fn main() {
     let texture = Texture2D::from_image(&harness.cpu.bus.canvas.image);
     texture.set_filter(FilterMode::Nearest);
     let mut draw_params = DrawTextureParams::default();
-    draw_params.dest_size = Some(Vec2 {
-        x: 32.0 * 18.0,
-        y: 32.0 * 18.0
-    });
+    let margin = 20.0;
+    let mut width = screen_width();
+    let mut height = screen_height();
+    let mut screen_m = if screen_width() > screen_height() {
+        screen_height()
+    } else {
+        screen_width()
+    };
+    let mut side = screen_m - 2.0 * margin;
+    draw_params.dest_size = Some(Vec2 { x: side, y: side });
 
     loop {
         let fps = get_fps();
         let cpf = harness.frequency / (fps as u32) + 1;
+
+        if width != screen_width() || height != screen_height() {
+            width = screen_width();
+            height = screen_height();
+            screen_m = if screen_width() > screen_height() {
+                screen_height()
+            } else {
+                screen_width()
+            };
+            side = screen_m - 2.0 * margin;
+            draw_params.dest_size = Some(Vec2 { x: side, y: side });
+        }
+
+        if is_key_pressed(KeyCode::W) || is_key_pressed(KeyCode::Up) {
+            harness.cpu.bus.memory[0xFF] = 0x77;
+        } else if is_key_pressed(KeyCode::A) || is_key_pressed(KeyCode::Left) {
+            harness.cpu.bus.memory[0xFF] = 0x61;
+        } else if is_key_pressed(KeyCode::D) || is_key_pressed(KeyCode::Right) {
+            harness.cpu.bus.memory[0xFF] = 0x64;
+        } else if is_key_pressed(KeyCode::S) || is_key_pressed(KeyCode::Down) {
+            harness.cpu.bus.memory[0xFF] = 0x73;
+        }
 
         clear_background(WHITE);
 
@@ -68,29 +98,19 @@ async fn main() {
                 harness.render(ui);
             });
         });
-    
+
         texture.update(&harness.cpu.bus.canvas.image);
-        draw_texture_ex(texture, 10.0, 10.0, WHITE, draw_params.clone());
+        draw_texture_ex(
+            texture,
+            (screen_width() - screen_m) / 2.0 + margin,
+            (screen_height() - screen_m) / 2.0 + margin,
+            WHITE,
+            draw_params.clone(),
+        );
 
         // Draw things before egui
         egui_macroquad::draw();
-        harness.frame(cpf);
-
-        if is_key_pressed(KeyCode::W) || is_key_pressed(KeyCode::Up) {
-            harness.cpu.bus.memory[0xFF] = 0x77;
-        } else if is_key_pressed(KeyCode::A)
-            || is_key_pressed(KeyCode::Left)
-        {
-            harness.cpu.bus.memory[0xFF] = 0x61;
-        } else if is_key_pressed(KeyCode::D)
-            || is_key_pressed(KeyCode::Right)
-        {
-            harness.cpu.bus.memory[0xFF] = 0x64;
-        } else if is_key_pressed(KeyCode::S)
-            || is_key_pressed(KeyCode::Down)
-        {
-            harness.cpu.bus.memory[0xFF] = 0x73;
-        }
+        harness.frame(cpf);       
 
         next_frame().await
     }

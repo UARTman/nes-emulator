@@ -1,6 +1,6 @@
 #![feature(bigint_helper_methods)]
 
-use egui::{Ui, text::LayoutJob, TextFormat};
+use egui::{text::LayoutJob, TextFormat, Ui};
 use status::Status;
 use thiserror::Error;
 
@@ -95,7 +95,11 @@ impl<T: Bus> CPU<T> {
                 tf
             }
             let mut layout = LayoutJob::default();
-            layout.append(&format!("Status register: 0x{:02x} (", self.status.byte), 0.0, TextFormat::default());
+            layout.append(
+                &format!("Status register: 0x{:02x} (", self.status.byte),
+                0.0,
+                TextFormat::default(),
+            );
             layout.append("N", 0.0, style_flag(self.status.negative()));
             layout.append("V", 0.0, style_flag(self.status.overflow()));
             layout.append("_", 0.0, style_flag(self.status._ignored_flag()));
@@ -109,7 +113,11 @@ impl<T: Bus> CPU<T> {
         });
         ui.label("Stack:");
         for i in 0..(self.stack_pointer / 2) as usize {
-            ui.label(&format!("0x{:04x}", self.bus.read_word(0x0100 + self.stack_pointer as usize - 2 - i * 2)));
+            ui.label(&format!(
+                "0x{:04x}",
+                self.bus
+                    .read_word(0x0100 + self.stack_pointer as usize - 2 - i * 2)
+            ));
         }
     }
 }

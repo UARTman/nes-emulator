@@ -1,11 +1,11 @@
 use egui::Ui;
-use m6502::{bus::Bus, CPU, CPUError};
+use m6502::{bus::Bus, CPUError, CPU};
 
 #[derive(Debug)]
 pub enum HarnessState {
     Paused,
     Running,
-    Error(CPUError)
+    Error(CPUError),
 }
 
 impl HarnessState {
@@ -28,7 +28,7 @@ impl HarnessState {
 pub struct Harness<T: Bus> {
     pub cpu: CPU<T>,
     pub frequency: u32,
-    pub state: HarnessState
+    pub state: HarnessState,
 }
 
 impl<T: Bus> Harness<T> {
