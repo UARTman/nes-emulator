@@ -39,6 +39,7 @@ pub struct CPU<T: Bus> {
     /// The stack is LIFO, top-down, 8 bit range, 0x0100 - 0x01FF.
     pub stack_pointer: u8,
     pub bus: T,
+    /// Cycles left until next command
     pub cycles_left: u8,
 }
 

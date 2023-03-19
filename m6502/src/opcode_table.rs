@@ -59,9 +59,6 @@ lazy_static::lazy_static! {
     };
 }
 
-/// The table used during instruction parsing. Auto-generated.
-// pub const OPCODE_TABLE: [Option<OpcodeEntry>; 256] = generate_table();
-
 /// An opcode list
 #[rustfmt::skip]
 const OPCODE_LIST: &[OpcodeEntry] = &[

@@ -1,3 +1,4 @@
+/// Memory bus. Represents all the memory-mapped devices.
 pub trait Bus {
     fn read(&self, addr: usize) -> u8;
     fn write(&mut self, addr: usize, data: u8);
