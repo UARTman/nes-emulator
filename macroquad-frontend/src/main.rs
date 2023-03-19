@@ -1,9 +1,6 @@
 use harness::Harness;
-use m6502::{
-    bus::{Snake, SnakeCanvas},
-    CPU,
-};
 use macroquad::prelude::*;
+use snake_game::snake_cpu;
 use crate::snake::MCSnakeCanvas;
 
 pub mod harness;
@@ -11,7 +8,7 @@ pub mod snake;
 
 #[macroquad::main("6502 Emulator")]
 async fn main() {
-    let mut harness = Harness::new(CPU::new(Snake::<MCSnakeCanvas>::new()));
+    let mut harness = Harness::new(snake_cpu::<MCSnakeCanvas>());
     harness.cpu.pc = 0x600;
     let texture = Texture2D::from_image(&harness.cpu.bus.canvas.image);
     texture.set_filter(FilterMode::Nearest);

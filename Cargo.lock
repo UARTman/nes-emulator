@@ -416,7 +416,6 @@ dependencies = [
  "egui",
  "lazy_static",
  "log",
- "rand",
  "thiserror",
 ]
 
@@ -444,6 +443,7 @@ dependencies = [
  "egui-macroquad",
  "m6502",
  "macroquad",
+ "snake-game",
 ]
 
 [[package]]
@@ -836,6 +836,14 @@ checksum = "0a345c870a1fae0b1b779085e81b51e614767c239e93503588e54c5b17f4b0e8"
 dependencies = [
  "smithay-client-toolkit",
  "wayland-client",
+]
+
+[[package]]
+name = "snake-game"
+version = "0.1.0"
+dependencies = [
+ "m6502",
+ "rand",
 ]
 
 [[package]]

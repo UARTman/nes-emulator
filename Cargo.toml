@@ -1,2 +1,2 @@
 [workspace]
-members = ["macroquad-frontend", "m6502"]
+members = ["macroquad-frontend", "m6502", "snake-game"]

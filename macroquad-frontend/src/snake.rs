@@ -1,5 +1,5 @@
 use macroquad::prelude::Image;
-use m6502::bus::SnakeCanvas;
+use snake_game::SnakeCanvas;
 
 pub struct MCSnakeCanvas {
     pub image: Image,
