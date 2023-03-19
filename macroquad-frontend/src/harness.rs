@@ -1,7 +1,5 @@
 use egui::Ui;
 use m6502::{bus::Bus, CPUError, CPU};
-use snake_game::snake_cpu;
-use crate::snake::MCSnakeCanvas;
 
 #[derive(Debug)]
 pub enum HarnessState {
