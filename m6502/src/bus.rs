@@ -10,6 +10,8 @@ pub trait Bus {
         self.write(addr, (data & 0xFF) as u8);
         self.write(addr + 1, (data >> 8) as u8)
     }
+
+    fn tick(&mut self) {}
 }
 
 pub struct Ram {

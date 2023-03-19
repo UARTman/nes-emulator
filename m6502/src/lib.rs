@@ -77,6 +77,7 @@ impl<T: Bus> CPU<T> {
             self.execute()?;
         }
         self.cycles_left -= 1;
+        self.bus.tick();
         Ok(())
     }
 
