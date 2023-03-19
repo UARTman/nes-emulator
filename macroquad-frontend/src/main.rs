@@ -1,5 +1,3 @@
-use std::cmp::min;
-
 use harness::Harness;
 use m6502::{
     bus::{Snake, SnakeCanvas},
