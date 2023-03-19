@@ -87,13 +87,14 @@ impl<T: Bus> CPU<T> {
         ));
         ui.label({
             fn style_flag(flag: bool) -> TextFormat {
-                let mut tf = TextFormat::default();
-                tf.color = if flag {
-                    egui::Color32::RED
-                } else {
-                    egui::Color32::DARK_GRAY
-                };
-                tf
+                TextFormat {
+                    color: if flag {
+                        egui::Color32::RED
+                    } else {
+                        egui::Color32::DARK_GRAY
+                    },
+                    ..Default::default()
+                }
             }
             let mut layout = LayoutJob::default();
             layout.append(

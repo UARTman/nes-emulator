@@ -44,9 +44,9 @@ impl<T: Bus + Clone> Harness<T> {
 
     pub fn render(&mut self, ui: &mut Ui) {
         if !self.state.is_error() {
-            ui.label(&format!("CPU is {:#?}", self.state));
+            ui.label(format!("CPU is {:#?}", self.state));
         } else {
-            ui.label(&format!(
+            ui.label(format!(
                 "CPU has encountered an error: {}",
                 self.state.error().unwrap()
             ));

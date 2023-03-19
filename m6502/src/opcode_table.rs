@@ -53,7 +53,7 @@ lazy_static::lazy_static! {
     pub static ref OPCODE_TABLE: [Option<OpcodeEntry>; 256] = {
         let mut x = [None; 256];
         for i in OPCODE_LIST {
-            x[i.code as usize] = Some(i.clone());
+            x[i.code as usize] = Some(*i);
         }
         x
     };

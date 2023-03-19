@@ -109,8 +109,14 @@ pub fn snake_cpu<T: SnakeCanvas>() -> CPU<Snake<T>> {
 impl<T: SnakeCanvas + Clone> Clone for Snake<T> {
     fn clone(&self) -> Self {
         Self {
-            memory: self.memory.clone(),
+            memory: self.memory,
             canvas: self.canvas.clone(),
         }
+    }
+}
+
+impl<T: SnakeCanvas> Default for Snake<T> {
+    fn default() -> Self {
+        Self::new()
     }
 }

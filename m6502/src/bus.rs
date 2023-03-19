@@ -43,3 +43,9 @@ impl Ram {
         self.memory[at..at + bytes.len()].copy_from_slice(bytes);
     }
 }
+
+impl Default for Ram {
+    fn default() -> Self {
+        Self::new()
+    }
+}

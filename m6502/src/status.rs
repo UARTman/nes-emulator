@@ -1,15 +1,9 @@
 use egui::text::LayoutJob;
 use egui::{Color32, FontFamily, FontId, TextFormat, Ui};
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct Status {
     pub byte: u8,
-}
-
-impl Default for Status {
-    fn default() -> Self {
-        Self { byte: 0 }
-    }
 }
 
 impl Status {

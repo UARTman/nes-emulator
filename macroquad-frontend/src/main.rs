@@ -65,10 +65,7 @@ async fn main() {
             });
 
             egui::Window::new("FPS monitor").open(&mut fps_monitor_open).show(egui_ctx, |ui| {
-                ui.horizontal(|ui| {
-                    ui.label(format!("FPS: {}", fps));
-                    ui.label(format!("Cycles per frame: {}", cpf));
-                });
+                ui.label(format!("FPS: {fps}. Cycles per frame: {cpf}."));
             });
             egui::Window::new("CPU").show(egui_ctx, |ui| {
                 harness.render(ui);
