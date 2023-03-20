@@ -23,7 +23,6 @@ async fn main() {
     };
     let mut side = screen_m - 2.0 * margin;
     draw_params.dest_size = Some(Vec2 { x: side, y: side });
-    let mut fps_monitor_open = true;
     let mut cpu_window_open = true;
 
     loop {
@@ -56,18 +55,19 @@ async fn main() {
 
         egui_macroquad::ui(|egui_ctx| {
             egui::TopBottomPanel::top("global-top").show(egui_ctx, |ui| {
-                egui::menu::bar(ui, |ui| {
-                    ui.menu_button("View", |ui| {
-                        ui.checkbox(&mut fps_monitor_open, "FPS monitor");
-                        ui.checkbox(&mut cpu_window_open, "CPU");
-                    })
-                })
+                ui.horizontal(|ui| {
+                    egui::menu::bar(ui, |ui| {
+                        ui.menu_button("View", |ui| {
+                            ui.checkbox(&mut cpu_window_open, "CPU");
+                        })
+                    });
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        ui.label(format!("FPS: {fps}. CPF: {cpf}."));
+                    });
+                });
             });
 
-            egui::Window::new("FPS monitor").open(&mut fps_monitor_open).show(egui_ctx, |ui| {
-                ui.label(format!("FPS: {fps}. Cycles per frame: {cpf}."));
-            });
-            egui::Window::new("CPU").show(egui_ctx, |ui| {
+            egui::Window::new("CPU").open(&mut cpu_window_open).show(egui_ctx, |ui| {
                 harness.render(ui);
             });
         });
