@@ -74,7 +74,7 @@ async fn main() {
 
         texture.update(&harness.cpu.bus.canvas.image);
         draw_texture_ex(
-            texture,
+            &texture,
             (screen_width() - screen_m) / 2.0 + margin,
             (screen_height() - screen_m) / 2.0 + margin,
             WHITE,
