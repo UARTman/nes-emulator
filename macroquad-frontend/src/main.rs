@@ -24,6 +24,7 @@ impl<'a> EguiWindowTransparentExt for egui::Window<'a> {
 async fn main() {
     let mut harness = Harness::new(snake_cpu::<MCSnakeCanvas>());
     harness.cpu.pc = 0x600;
+    harness.frequency = 10000;
     let texture = Texture2D::from_image(&harness.cpu.bus.canvas.image);
     texture.set_filter(FilterMode::Nearest);
     let mut draw_params = DrawTextureParams::default();
