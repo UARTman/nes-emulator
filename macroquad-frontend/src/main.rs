@@ -1,3 +1,4 @@
+use egui::{Frame, Style, Color32};
 use harness::Harness;
 use macroquad::prelude::*;
 use snake_game::snake_cpu;
@@ -5,6 +6,19 @@ use crate::snake::MCSnakeCanvas;
 
 pub mod harness;
 pub mod snake;
+
+trait EguiWindowTransparentExt {
+    fn transparent(self) -> Self;
+}
+
+impl<'a> EguiWindowTransparentExt for egui::Window<'a> {
+    fn transparent(self) -> Self {
+        let fr = Frame::window(&Style::default());
+        let col = fr.fill;
+        let fr1 = fr.fill(Color32::from_rgba_unmultiplied(col.r(), col.g(), col.b(), 245));
+        self.frame(fr1)
+    }
+}
 
 #[macroquad::main("6502 Emulator")]
 async fn main() {
@@ -67,7 +81,7 @@ async fn main() {
                 });
             });
 
-            egui::Window::new("CPU").open(&mut cpu_window_open).show(egui_ctx, |ui| {
+            egui::Window::new("CPU").transparent().open(&mut cpu_window_open).show(egui_ctx, |ui| {
                 harness.render(ui);
             });
         });
