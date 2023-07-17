@@ -48,24 +48,14 @@ impl Status {
     pub fn render(&mut self, ui: &mut Ui) {
         let mut layout = LayoutJob::default();
         fn flag_format(x: bool) -> TextFormat {
-            let clicked = TextFormat {
-                color: Color32::RED,
+            let color = if x {Color32::RED} else {TextFormat::default().color};
+            TextFormat {
+                color,
                 font_id: FontId {
                     family: FontFamily::Monospace,
                     ..FontId::default()
                 },
                 ..TextFormat::default()
-            };
-            if x {
-                clicked
-            } else {
-                TextFormat {
-                    font_id: FontId {
-                        family: FontFamily::Monospace,
-                        ..FontId::default()
-                    },
-                    ..TextFormat::default()
-                }
             }
         }
         layout.append(
