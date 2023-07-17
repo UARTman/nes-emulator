@@ -24,9 +24,15 @@ use egui::{Color32, FontFamily, FontId, TextFormat, Ui};
  flag!(overflow, set_overflow, 6);
  flag!(negative, set_negative, 7);
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct Status {
     pub byte: u8,
+}
+
+impl Default for Status {
+    fn default() -> Self {
+        Self { byte: 1 << 5 }
+    }
 }
 
 impl Status {
