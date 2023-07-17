@@ -1,82 +1,42 @@
 use egui::text::LayoutJob;
 use egui::{Color32, FontFamily, FontId, TextFormat, Ui};
 
+ macro_rules! flag {
+    ($f:ident, $set:ident, $bit:expr) => {
+        impl Status {
+            pub fn $f(&self) -> bool {
+                (self.byte & (1 << $bit)) != 0
+            }
+
+            pub fn $set(&mut self, value: bool) {
+                self.set_mask(value, 1 << $bit)
+            }
+        }
+    }
+ }
+
+ flag!(carry, set_carry, 0);
+ flag!(zero, set_zero, 1);
+ flag!(interrupt_disabled, set_interrupt_disabled, 2);
+ flag!(decimal, set_decimal, 3);
+ flag!(break_flag, set_break, 4);
+ flag!(_ignored_flag, _set_ignored_flag, 5);
+ flag!(overflow, set_overflow, 6);
+ flag!(negative, set_negative, 7);
+
 #[derive(Clone, Default)]
 pub struct Status {
     pub byte: u8,
 }
 
 impl Status {
+    #[inline]
     fn set_mask(&mut self, value: bool, mask: u8) {
         if value {
             self.byte |= mask
         } else {
             self.byte &= !mask
         }
-    }
-
-    pub fn carry(&self) -> bool {
-        (self.byte & 1) != 0
-    }
-
-    pub fn set_carry(&mut self, value: bool) {
-        self.set_mask(value, 0b00000001);
-    }
-
-    pub fn zero(&self) -> bool {
-        (self.byte & 0b10) != 0
-    }
-
-    pub fn set_zero(&mut self, value: bool) {
-        self.set_mask(value, 0b00000010);
-    }
-
-    pub fn interrupt_disabled(&self) -> bool {
-        (self.byte & 0b100) != 0
-    }
-
-    pub fn set_interrupt_disabled(&mut self, value: bool) {
-        self.set_mask(value, 0b00000100);
-    }
-
-    pub fn decimal(&self) -> bool {
-        (self.byte & 0b1000) != 0
-    }
-
-    pub fn set_decimal(&mut self, value: bool) {
-        self.set_mask(value, 0b00001000);
-    }
-
-    pub fn break_flag(&self) -> bool {
-        (self.byte & 0b10000) != 0
-    }
-
-    pub fn set_break(&mut self, value: bool) {
-        self.set_mask(value, 0b00010000);
-    }
-
-    pub fn _ignored_flag(&self) -> bool {
-        (self.byte & 0b100000) != 0
-    }
-
-    pub fn _set_ignored_flag(&mut self, value: bool) {
-        self.set_mask(value, 0b00100000);
-    }
-
-    pub fn overflow(&self) -> bool {
-        (self.byte & 0b1000000) != 0
-    }
-
-    pub fn set_overflow(&mut self, value: bool) {
-        self.set_mask(value, 0b01000000);
-    }
-
-    pub fn negative(&self) -> bool {
-        (self.byte & 0b10000000) != 0
-    }
-
-    pub fn set_negative(&mut self, value: bool) {
-        self.set_mask(value, 0b10000000);
     }
 
     pub fn render(&mut self, ui: &mut Ui) {
