@@ -1,8 +1,8 @@
-use egui::{Frame, Style, Color32};
+use crate::snake::MCSnakeCanvas;
+use egui::{Color32, Frame, Style};
 use harness::Harness;
 use macroquad::prelude::*;
 use snake_game::snake_cpu;
-use crate::snake::MCSnakeCanvas;
 
 pub mod harness;
 pub mod snake;
@@ -15,7 +15,12 @@ impl<'a> EguiWindowTransparentExt for egui::Window<'a> {
     fn transparent(self) -> Self {
         let fr = Frame::window(&Style::default());
         let col = fr.fill;
-        let fr1 = fr.fill(Color32::from_rgba_unmultiplied(col.r(), col.g(), col.b(), 245));
+        let fr1 = fr.fill(Color32::from_rgba_unmultiplied(
+            col.r(),
+            col.g(),
+            col.b(),
+            245,
+        ));
         self.frame(fr1)
     }
 }
@@ -82,9 +87,12 @@ async fn main() {
                 });
             });
 
-            egui::Window::new("CPU").transparent().open(&mut cpu_window_open).show(egui_ctx, |ui| {
-                harness.render(ui);
-            });
+            egui::Window::new("CPU")
+                .transparent()
+                .open(&mut cpu_window_open)
+                .show(egui_ctx, |ui| {
+                    harness.render(ui);
+                });
         });
 
         texture.update(&harness.cpu.bus.canvas.image);
@@ -98,7 +106,7 @@ async fn main() {
 
         // Draw things before egui
         egui_macroquad::draw();
-        harness.frame(cpf);       
+        harness.frame(cpf);
 
         next_frame().await
     }

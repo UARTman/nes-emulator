@@ -1,6 +1,6 @@
-use rand::Rng;
 use m6502::bus::Bus;
 use m6502::CPU;
+use rand::Rng;
 
 pub trait SnakeCanvas: Default {
     fn write_pixel(&mut self, at: usize, colors: (u8, u8, u8, u8));
